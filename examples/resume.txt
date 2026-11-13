@@ -1,0 +1,8 @@
+Research profile example
+
+Built REST APIs with Python and FastAPI for an inventory service.
+Used PostgreSQL and SQL to design queries and maintain data integrity.
+Added pytest integration tests and unit tests for request validation.
+Containerized the application with Docker and maintained Git review workflows.
+
+Synthetic demonstration text. Replace it with consented job-related evidence for research evaluation.

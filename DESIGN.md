@@ -1,0 +1,70 @@
+---
+version: alpha
+name: Candidate Lab
+description: An evidence review workspace for transparent candidate matching research.
+colors:
+  primary: "#126c68"
+  navigation: "#142b40"
+  background: "#f3f6f8"
+  surface: "#ffffff"
+  text: "#173042"
+  muted: "#526979"
+  border: "#d4dfe6"
+  warning: "#825315"
+  danger: "#a13442"
+  focus: "#1767a5"
+typography:
+  display:
+    fontFamily: "Georgia, serif"
+  sans:
+    fontFamily: "Segoe UI, Arial, sans-serif"
+  mono:
+    fontFamily: "Consolas, monospace"
+rounded:
+  DEFAULT: "0.625rem"
+  sm: "0.375rem"
+spacing:
+  section-gap: "1.75rem"
+  page-max: "82rem"
+components:
+  button:
+    height: "2.75rem"
+  input:
+    height: "2.75rem"
+---
+
+## Overview
+Naming: use Job details, job requirements, Profile name and explicit Version labels. Timestamp suffixes and random IDs must not serve as job/profile titles. Demonstration profile names describe professional experience; synthetic badges remain visible. Saved-run numbers are separate navigation references, not part of job names. Current display names can change without rewriting historical evidence.
+Version 0.2 extends the existing evidence-led workspace rather than introducing a new visual style. Opportunity articles use labelled status/actions, skill-gap reports reuse the requirement ledger, comparison tables show explicit before/after values and evaluation tables show measured metrics with provenance. Keep the expanded sidebar scrollable and mobile navigation wrapped. Do not fabricate performance indicators or hide synthetic dataset labels.
+Sign-in refinement: the left panel is intentionally minimal—brand, restrained headline, one description and an access footer. No illustrative evidence card or workflow strip. Keep evidence detail inside the signed-in matching workspace.
+Submission presentation update: use professional product wording in authentication, navigation and footer; remove academic/prototype branding. Retain explicit sample-data provenance and score/audit limitations. The sign-in signature is a labelled requirement-to-evidence example. Recruiter overview cards show database counts only, with sample-profile inclusion explicit. Preserve the navy/teal palette and role-specific navigation.
+Product register, not a marketing landing page. A research reading room: quiet navy navigation, white work surfaces and teal actions. The signature is a requirement-to-evidence ledger with visible score contributions. Avoid generic AI gradients, animated hiring claims and unexplained percentage badges.
+
+## Colors
+The normative values above map one-to-one to --primary, --navigation, --background, --surface, --text, --muted, --border, --warning, --danger and --focus in src/styles.css. Colors are semantic; group comparisons use labels and values, not color alone. Light theme only; forced-colors respects the OS. Scrollbars inherit border and muted tokens globally.
+
+## Typography
+Georgia display headings are restrained to the page title and login thesis. Segoe UI carries forms and prose. Consolas identifies model versions and event IDs. No remote fonts or layout-changing font downloads. Body text uses 1.5 line height and tabular numbers for scores.
+
+## Layout
+Desktop sidebar is 236px; main content is bounded by page-max. Tables own horizontal overflow. Below 820px the navigation becomes a compact top strip, and detail panels stack. Forms use natural document height. Sections use section-gap and a 6/12/18/24px spacing rhythm.
+
+## Elevation & Depth
+Use borders and tonal surfaces. Only a small shadow on the evidence drawer/dialog; no floating dashboard cards with decorative shadows.
+
+## Shapes
+Moderate 10px panel corners, 6px controls. Skill labels are compact rounded rectangles, not decorative bubbles.
+
+## Components
+Shared Button, Field, Panel, Notice, Pager and Status components own states. Native selects accept OS-owned popup geometry. Dialog owns Escape, focus containment and return focus. Busy actions retain dimensions. Forms preserve drafts on failure, mark invalid fields and focus the first problem. Lucide line icons use adjacent labels or accessible names. Motion is restricted to short state feedback and disabled under reduced motion.
+
+## Do's and Don'ts
+- Do connect every score to a visible component and evidence passage.
+- Do label demo fixtures, model method and small audit samples honestly.
+- Don't expose audit groups in recruiter rankings or infer demographics.
+- Don't call a matching score a hiring probability or a fairness certificate.
+
+## Application review with matching evidence
+Applications → Review application loads the exact submitted resume and a saved matching snapshot for that application, submitted version and current job-requirements version. The review displays score, method, date and skill evidence. Without a matching snapshot, a decision cannot be saved; open job matching first. Scores are evidence summaries, not probabilities of recruitment success.
+
+Feedback is now generated by the server from that saved evidence and the recruiter-selected status. The manual feedback field is removed. Candidates receive the score, supported skills and required skills needing clearer evidence, with context limitations and the recruiter decision. No email is sent. A new additive decision_evidence table links each new decision to its frozen matching snapshot; later matching/profile changes do not rewrite existing feedback. Manual feedback from earlier releases remains historical. Recruiters retain control of decisions; feedback generation does not auto-select or reject people. This supersedes earlier instructions to type candidate feedback.

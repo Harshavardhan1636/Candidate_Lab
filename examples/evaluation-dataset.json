@@ -1,0 +1,19 @@
+{
+  "name": "Synthetic relevance smoke test v1",
+  "provenance": "Hand-authored fictional resume snippets with illustrative relevance grades. Not an independently annotated or representative applicant dataset; no training was performed on this fixture.",
+  "synthetic": true,
+  "queries": [
+    {"id": "backend-python", "required": ["Python", "SQL", "REST APIs"], "preferred": ["FastAPI", "Testing"], "profiles": [
+      {"id": "backend-strong", "text": "Built Python REST APIs using FastAPI and PostgreSQL. Wrote pytest integration tests for request validation and persistence.", "relevance": 2},
+      {"id": "backend-partial", "text": "Developed Python scripts and SQL queries for monthly reporting. Maintained Git workflows and technical documentation.", "relevance": 1},
+      {"id": "backend-learning", "text": "Currently learning Python and SQL. No experience with REST APIs. Designed CSS and HTML layouts for a personal website.", "relevance": 0},
+      {"id": "backend-unrelated", "text": "Created Excel dashboards and stakeholder presentations. Used statistics to summarize monthly product trends and forecasts.", "relevance": 0}
+    ]},
+    {"id": "frontend-react", "required": ["React", "TypeScript", "CSS"], "preferred": ["Testing"], "profiles": [
+      {"id": "frontend-strong", "text": "Developed React and TypeScript applications with CSS layouts. Added unit tests for accessible forms and maintained Git reviews.", "relevance": 2},
+      {"id": "frontend-partial", "text": "Built React interfaces using JavaScript and CSS. Integrated REST APIs and maintained HTML templates for product pages.", "relevance": 1},
+      {"id": "frontend-negated", "text": "No experience with React or TypeScript. Built Python services using SQL queries and PostgreSQL for warehouse data.", "relevance": 0},
+      {"id": "frontend-unrelated", "text": "Analyzed Excel data with statistics and created Tableau reports. Maintained technical documentation for operational teams.", "relevance": 0}
+    ]}
+  ]
+}

@@ -4,7 +4,7 @@
 
 A working local research application for **Fair and Explainable Machine Learning for Automated Candidate Selection and Skill Matching**. Human-reviewed candidate-job matching, explicit score contributions, and restricted aggregate synthetic-cohort audits.
 
-Documentation: [Product](PRODUCT.md) · [Design](DESIGN.md) · [UX contract](UX-CONTRACT.md) · [Upgrade guide](UPGRADE-v0.2.md) · [Evaluation](EVALUATION.md) · [Verification](VERIFICATION.md) · [Project report](report/Candidate_Lab_Project_Report.pdf) · [Screenshots](screenshots/)
+Documentation: [Product](PRODUCT.md) · [Design](DESIGN.md) · [UX contract](UX-CONTRACT.md) · [Upgrade guide](UPGRADE-v0.2.md) · [Evaluation](EVALUATION.md) · [Verification](VERIFICATION.md) · [Report (Standard)](report/Candidate_Lab_Project_Report_Standard.pdf) · [Report (Detailed)](report/Candidate_Lab_Project_Report_Detailed.pdf) · [Screenshots](screenshots/)
 
 ## Run locally on Windows
 

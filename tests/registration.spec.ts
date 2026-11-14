@@ -20,7 +20,7 @@ for (const role of ["candidate", "recruiter", "auditor"]) {
     if (role === "candidate") {
       await page.setViewportSize({ width: 390, height: 844 });
       await page.screenshot({
-        path: "screenshots/registration-mobile.png",
+        path: "docs/screenshots/registration-mobile.png",
         fullPage: true,
       });
       expect(

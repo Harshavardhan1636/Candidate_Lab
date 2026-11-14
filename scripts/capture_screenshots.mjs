@@ -5,7 +5,7 @@ import { chromium } from "@playwright/test";
 import { mkdirSync } from "node:fs";
 
 const base = process.env.APP_URL || "http://127.0.0.1:8000";
-const output = "screenshots";
+const output = "docs/screenshots";
 mkdirSync(output, { recursive: true });
 
 const browser = await chromium.launch({ channel: "chrome" });

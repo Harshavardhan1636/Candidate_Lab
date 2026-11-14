@@ -63,7 +63,7 @@ The included dataset has two fictional job queries and eight short profiles with
 
 ## Verification and documentation
 
-The expanded test suite covers applications, ownership, publication, job editing with version conflicts, immutable submissions, contextual evidence, snapshot deltas, metric calculations, evaluation role restrictions and actual local semantic inference. See VERIFICATION.md for completed checks. Older generated PDFs describe the earlier release and are retained as historical documents; this guide records the new scope.
+The expanded test suite covers applications, ownership, publication, job editing with version conflicts, immutable submissions, contextual evidence, snapshot deltas, metric calculations, evaluation role restrictions and actual local semantic inference. See [VERIFICATION.md](VERIFICATION.md) for completed checks. This guide records the current scope.
 
 Still outside this release: training a recruitment model, real demographic fairness validation, email verification/recovery, OCR, tenant isolation, durable workers and public cloud deployment. PostgreSQL/Docker production verification and comprehensive schema migrations remain follow-up work.
 

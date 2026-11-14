@@ -9,7 +9,8 @@ playwright-report/
 test-results/
 *.log
 *.png
-!report-assets/figures/*.png
+!docs/report/assets/figures/*.png
+!docs/screenshots/*.png
 .test-tmp/
 models/
 

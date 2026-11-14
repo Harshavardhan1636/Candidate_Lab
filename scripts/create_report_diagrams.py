@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import FancyArrowPatch, FancyBboxPatch, Circle
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT = ROOT / "report-assets" / "figures"
+OUT = ROOT / "docs" / "report" / "assets" / "figures"
 OUT.mkdir(parents=True, exist_ok=True)
 
 NAVY = "#142b40"

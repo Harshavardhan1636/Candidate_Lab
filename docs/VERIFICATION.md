@@ -2,19 +2,18 @@
 
 Version 0.2 verified locally on Windows, 14 November 2026. Synthetic relevance metrics demonstrate evaluation functionality; no real-applicant predictive quality or demographic fairness result is claimed.
 
-| Check                               | Result                                                          |
-| ----------------------------------- | --------------------------------------------------------------- |
-| API/model integration suite         | 26 tests passed, including actual cached semantic inference     |
-| Production-build Chrome journeys    | 9 tests passed                                                  |
-| Demo seed counts                    | 12 profiles, 3 jobs, 1 application, 2 runs, 0 reviews           |
-| TypeScript type checking            | Passed                                                          |
-| Production shell assets             | `/` and `/favicon.svg` served with 200; SPA shell loads         |
-| Vite production build               | Passed                                                          |
-| ESLint                              | Passed with no warnings                                         |
-| Prettier source formatting          | Passed                                                          |
-| Premium UI strict project audit     | 0 findings recorded before the final additive job-edit controls |
-| DESIGN.md validator                 | Earlier run: 0 errors; 7 orphan-token warnings                  |
-| Desktop and 390px audit screenshots | Rendered and visually inspected; no page overflow at 390px      |
+| Check                               | Result                                                      |
+| ----------------------------------- | ----------------------------------------------------------- |
+| API/model integration suite         | 26 tests passed, including actual cached semantic inference |
+| Production-build Chrome journeys    | 9 tests passed                                              |
+| Demo seed counts                    | 12 profiles, 3 jobs, 1 application, 2 runs, 0 reviews       |
+| TypeScript type checking            | Passed                                                      |
+| Production shell assets             | `/` and `/favicon.svg` served with 200; SPA shell loads     |
+| Vite production build               | Passed                                                      |
+| ESLint                              | Passed with no warnings                                     |
+| Prettier source formatting          | Passed                                                      |
+| DESIGN.md validator                 | Earlier run: 0 errors; 7 orphan-token warnings              |
+| Desktop and 390px audit screenshots | Rendered and visually inspected; no page overflow at 390px  |
 
 ## Integration coverage
 
@@ -33,7 +32,7 @@ The browser suite starts its own production-build server on port 8001 with a dis
 
 ## Non-blocking warnings
 
-The earlier TestClient HTTPX deprecation warning is resolved by the currently installed dependencies. DESIGN.md's validator previously reported seven custom color tokens as unreferenced by its component YAML; these tokens are implemented in src/styles.css. The strict project UI audit recorded zero findings before the final additive job-edit controls; typecheck, ESLint, build and browser journeys cover the current UI. No complete accessibility or security certification is claimed.
+The earlier TestClient HTTPX deprecation warning is resolved by the currently installed dependencies. [DESIGN.md](DESIGN.md)'s validator previously reported seven custom color tokens as unreferenced by its component YAML; these tokens are implemented in src/styles.css. Typecheck, ESLint, build and browser journeys cover the current UI. No complete accessibility or security certification is claimed.
 
 ## Not exercised
 

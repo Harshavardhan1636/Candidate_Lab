@@ -1,8 +1,8 @@
 package-lock.json
 node_modules/
 dist/
-report-assets/
-screenshots/
+docs/report/
+docs/screenshots/
 data/
 models/
 .venv/

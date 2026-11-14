@@ -105,7 +105,7 @@ test("candidate evidence gap, application update and snapshot comparison", async
     .click();
   await expect(page.getByRole("cell", { name: /v1.*v1 both/ })).toBeVisible();
   await page.screenshot({
-    path: "screenshots/snapshot-comparison-v2.png",
+    path: "docs/screenshots/snapshot-comparison-v2.png",
     fullPage: true,
   });
   await page.getByRole("link", { name: "Applications", exact: true }).click();
@@ -177,7 +177,7 @@ test("measured TF-IDF and local semantic evaluation, export and auditor aggregat
   await page.getByRole("button", { name: "Export evaluation" }).click();
   expect((await download).suggestedFilename()).toContain("model-evaluation");
   await page.screenshot({
-    path: "screenshots/model-evaluation-v2.png",
+    path: "docs/screenshots/model-evaluation-v2.png",
     fullPage: true,
   });
   await page.setViewportSize({ width: 390, height: 844 });

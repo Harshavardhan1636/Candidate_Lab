@@ -126,7 +126,7 @@ test("recruiter creates, corrects, matches and reviews evidence", async ({
     page.getByText("Last human review", { exact: true }),
   ).toBeVisible();
   await page.screenshot({
-    path: "screenshots/evidence-desktop.png",
+    path: "docs/screenshots/evidence-desktop.png",
     fullPage: true,
   });
   expect(errors).toEqual([]);
@@ -153,7 +153,7 @@ test("auditor aggregate export, keyboard controls and narrow layout", async ({
   expect((await download).suggestedFilename()).toContain("cohort-audit");
   await page.setViewportSize({ width: 390, height: 844 });
   await page.screenshot({
-    path: "screenshots/audit-mobile.png",
+    path: "docs/screenshots/audit-mobile.png",
     fullPage: true,
   });
   expect(

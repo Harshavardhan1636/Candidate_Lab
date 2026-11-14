@@ -2,7 +2,7 @@
 
 The script intentionally keeps the report content in one place so that the
 DOCX can be regenerated after verification. Diagrams are pre-rendered PNG
-files in report-assets/figures; the official banner and logo are extracted
+files in docs/report/assets/figures; the official banner and logo are extracted
 from the supplied format document.
 """
 from __future__ import annotations
@@ -26,9 +26,9 @@ from docx.oxml.ns import qn
 from docx.shared import Cm, Pt, RGBColor
 
 ROOT = Path(__file__).resolve().parent.parent
-ASSETS = ROOT / "report-assets"
+ASSETS = ROOT / "docs" / "report" / "assets"
 FIGURES = ASSETS / "figures"
-OUT_DOCX = ROOT / "Candidate_Lab_Project_Report.docx"
+OUT_DOCX = ROOT / "docs" / "report" / "Candidate_Lab_Project_Report.docx"
 
 NAVY = RGBColor(0x14, 0x2B, 0x40)
 BLUE = RGBColor(0x1F, 0x38, 0x64)

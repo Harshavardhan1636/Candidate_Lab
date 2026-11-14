@@ -1,6 +1,6 @@
 param(
-    [string]$Docx = (Join-Path $PSScriptRoot '..\Candidate_Lab_Project_Report.docx'),
-    [string]$Pdf = (Join-Path $PSScriptRoot '..\Candidate_Lab_Project_Report.pdf')
+    [string]$Docx = (Join-Path $PSScriptRoot '..\docs\report\Candidate_Lab_Project_Report.docx'),
+    [string]$Pdf = (Join-Path $PSScriptRoot '..\docs\report\Candidate_Lab_Project_Report.pdf')
 )
 
 $ErrorActionPreference = 'Stop'

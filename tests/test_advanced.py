@@ -17,13 +17,13 @@ def test_applications_gaps_and_immutable_submissions(client):
     j=create_job(client)
     assert client.post(f"/api/jobs/{j['id']}/runs").status_code==422
     login(client,'candidate')
-    assert client.get('/api/opportunities').json()['total']==0
+    assert client.get('/api/opportunities').json()['total']==1
     profile=client.post('/api/candidates',json={'label':'Applicant test','text':TEXT}).json()
     assert client.post(f"/api/jobs/{j['id']}/applications",json={'candidate_id':profile['id']}).status_code==404
     login(client)
     client.put(f"/api/jobs/{j['id']}/publication",json={'published':True})
     login(client,'candidate')
-    assert client.get('/api/opportunities').json()['total']==1
+    assert client.get('/api/opportunities').json()['total']==2
     gap=client.get(f"/api/jobs/{j['id']}/skill-gap",params={'candidate_id':profile['id']}).json()
     assert all(r['status']=='supported' for r in gap['requirements'])
     a=client.post(f"/api/jobs/{j['id']}/applications",json={'candidate_id':profile['id']}).json()
@@ -66,7 +66,7 @@ def test_applications_gaps_and_immutable_submissions(client):
     assert client.get('/api/applications').status_code==403
     assert client.put(f"/api/applications/{a['id']}/decision",json=decision).status_code==403
     with Session(module.engine) as session:
-        assert len(session.scalars(select(ApplicationVersion)).all())==3
+        assert len(session.scalars(select(ApplicationVersion).where(ApplicationVersion.application_id==a['id'])).all())==3
 
 
 def test_candidate_ownership_publication_and_withdrawal(client):
@@ -78,12 +78,12 @@ def test_candidate_ownership_publication_and_withdrawal(client):
         assert client.post(f"/api/jobs/{j['id']}/applications",json={'candidate_id':foreign}).status_code==403
     assert client.put(f"/api/jobs/{j['id']}/publication",json={'published':False}).status_code==403
     a=client.post(f"/api/jobs/{j['id']}/applications",json={'candidate_id':own}).json()
-    assert client.get('/api/applications').json()['total']==1
+    assert client.get('/api/applications',params={'job_id':j['id']}).json()['total']==1
     login(client)
     assert client.post(f"/api/applications/{a['id']}/withdraw").status_code==403
     client.put(f"/api/jobs/{j['id']}/publication",json={'published':False})
     login(client,'candidate')
-    assert client.get('/api/opportunities').json()['total']==0
+    assert client.get('/api/opportunities').json()['total']==1
     client.post(f"/api/applications/{a['id']}/withdraw")
     assert client.post(f"/api/jobs/{j['id']}/applications",json={'candidate_id':own}).status_code==404
     login(client)

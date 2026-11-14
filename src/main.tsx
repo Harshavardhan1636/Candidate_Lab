@@ -18,6 +18,7 @@ import {
   Eye,
   EyeOff,
   Download,
+  Pencil,
 } from "lucide-react";
 import {
   api,
@@ -76,6 +77,9 @@ function useLoad<T>(path: string | null, refresh = 0) {
   return { ...state, retry: () => setRetry((v) => v + 1) };
 }
 type Go = (view: string, extra?: Record<string, string>) => void;
+type NoticeFn = (message: string, error?: boolean) => void;
+const plural = (count: number, singular: string, pluralForm = `${singular}s`) =>
+  `${count} ${count === 1 ? singular : pluralForm}`;
 function PageHeader({
   eyebrow,
   title,
@@ -282,7 +286,7 @@ function Jobs({
   user: User;
   q: string;
   page: number;
-  notice: (m: string) => void;
+  notice: NoticeFn;
 }) {
   const load = useLoad<Page<Job>>(
     `/jobs?page=${page}&q=${encodeURIComponent(q)}`,
@@ -304,7 +308,7 @@ function Jobs({
       );
       go("matches", { run: run.id });
     } catch (e) {
-      notice((e as Error).message);
+      notice((e as Error).message, true);
     } finally {
       setBusy("");
     }
@@ -337,7 +341,7 @@ function Jobs({
             {
               label: "Candidate profiles",
               value: overview.data.profiles,
-              note: `${overview.data.sample_profiles} labelled sample profiles included`,
+              note: `${plural(overview.data.sample_profiles, "labelled sample profile")} included`,
               icon: UsersRound,
               view: "candidates",
             },
@@ -391,7 +395,9 @@ function Jobs({
       <Panel
         title="Job details"
         action={
-          <span className="muted small">{load.data?.total ?? "—"} roles</span>
+          <span className="muted small">
+            {load.data ? plural(load.data.total, "role") : "— roles"}
+          </span>
         }
       >
         <div className="toolbar">
@@ -445,15 +451,24 @@ function Jobs({
                   </div>
                 </div>
                 {user.role === "recruiter" && (
-                  <Button
-                    variant="secondary"
-                    busy={busy === j.id}
-                    disabled={!!busy}
-                    onClick={() => match(j)}
-                  >
-                    Run matching
-                    <ArrowUpRight size={16} />
-                  </Button>
+                  <div className="job-actions">
+                    <Button
+                      variant="secondary"
+                      onClick={() => go("job-edit", { id: j.id })}
+                    >
+                      <Pencil size={15} />
+                      Edit
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      busy={busy === j.id}
+                      disabled={!!busy}
+                      onClick={() => match(j)}
+                    >
+                      Run matching
+                      <ArrowUpRight size={16} />
+                    </Button>
+                  </div>
                 )}
               </article>
             ))}
@@ -495,15 +510,19 @@ function JobForm({
   go,
   setDirty,
   notice,
+  initial,
 }: {
   go: Go;
   setDirty: (v: boolean) => void;
-  notice: (s: string) => void;
+  notice: NoticeFn;
+  initial?: Job;
 }) {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [required, setRequired] = useState("");
-  const [preferred, setPreferred] = useState("");
+  const [title, setTitle] = useState(initial?.title || "");
+  const [description, setDescription] = useState(initial?.description || "");
+  const [required, setRequired] = useState(initial?.required.join(", ") || "");
+  const [preferred, setPreferred] = useState(
+    initial?.preferred.join(", ") || "",
+  );
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const catalog = useLoad<string[]>("/skills");
@@ -527,8 +546,8 @@ function JobForm({
     }
     setBusy(true);
     try {
-      await api("/jobs", {
-        method: "POST",
+      await api(initial ? `/jobs/${initial.id}` : "/jobs", {
+        method: initial ? "PUT" : "POST",
         body: JSON.stringify({
           title: title.trim(),
           description: description.trim(),
@@ -540,10 +559,15 @@ function JobForm({
             .split(",")
             .map((s) => s.trim())
             .filter(Boolean),
+          version: initial?.version,
         }),
       });
       setDirty(false);
-      notice("Job created.");
+      notice(
+        initial
+          ? "Job requirements updated. New matching runs will use the new version."
+          : "Job created.",
+      );
       go("jobs", { saved: String(Date.now()) });
     } catch (e) {
       setError((e as Error).message);
@@ -554,8 +578,12 @@ function JobForm({
   return (
     <>
       <PageHeader
-        eyebrow="Jobs / New job"
-        title="Define the evidence you need."
+        eyebrow={initial ? "Jobs / Edit job" : "Jobs / New job"}
+        title={
+          initial
+            ? "Update the evidence you need."
+            : "Define the evidence you need."
+        }
         description="Use role-related skills. Avoid identity, prestige and unsupported personality criteria."
       />
       <form
@@ -564,7 +592,13 @@ function JobForm({
         onSubmit={submit}
         onChange={() => setDirty(true)}
       >
-        <Panel title="Job requirements">
+        <Panel
+          title={
+            initial
+              ? `Job requirements · version ${initial.version}`
+              : "Job requirements"
+          }
+        >
           {error && <Notice error message={error} />}
           <Field
             id="title"
@@ -636,7 +670,7 @@ function JobForm({
               Cancel
             </Button>
             <Button type="submit" busy={busy}>
-              Create job
+              {initial ? "Save job" : "Create job"}
             </Button>
           </div>
         </Panel>
@@ -657,6 +691,37 @@ function JobForm({
         </aside>
       </form>
     </>
+  );
+}
+
+function JobEdit({
+  ident,
+  go,
+  setDirty,
+  notice,
+}: {
+  ident: string | null;
+  go: Go;
+  setDirty: (v: boolean) => void;
+  notice: NoticeFn;
+}) {
+  const load = useLoad<Job>(ident ? `/jobs/${ident}` : null);
+  if (load.loading) return <Loading />;
+  if (load.error || !load.data)
+    return (
+      <Failure
+        message={load.error || "Job requirements could not be loaded."}
+        retry={load.retry}
+      />
+    );
+  return (
+    <JobForm
+      key={load.data.id}
+      initial={load.data}
+      go={go}
+      setDirty={setDirty}
+      notice={notice}
+    />
   );
 }
 
@@ -705,7 +770,8 @@ function Candidates({
             onChange={(q) => go("candidates", { q })}
           />
           <span className="small muted">
-            Pseudonymous labels · {load.data?.total ?? "—"} profiles
+            Pseudonymous labels ·{" "}
+            {load.data ? plural(load.data.total, "profile") : "— profiles"}
           </span>
         </div>
         {load.loading ? (
@@ -810,7 +876,7 @@ function ProfilePage({
   user: User;
   go: Go;
   setDirty: (v: boolean) => void;
-  notice: (s: string) => void;
+  notice: NoticeFn;
 }) {
   const load = useLoad<Candidate>(ident ? `/candidates/${ident}` : null);
   if (ident && load.loading) return <Loading />;
@@ -830,7 +896,7 @@ function ProfilePage({
           }
         />
         <div className="form-layout">
-          <Panel title={`Resume evidence � Version ${profile.version}`}>
+          <Panel title={`Resume evidence · Version ${profile.version}`}>
             <p style={{ whiteSpace: "pre-wrap" }}>{profile.text}</p>
           </Panel>
           <aside>
@@ -873,7 +939,7 @@ function ProfileForm({
   initial?: Candidate;
   go: Go;
   setDirty: (v: boolean) => void;
-  notice: (s: string) => void;
+  notice: NoticeFn;
 }) {
   const [label, setLabel] = useState(initial?.label || "");
   const [text, setText] = useState(initial?.text || "");
@@ -1119,7 +1185,7 @@ function MatchPage({
 }: {
   selectedRun: string | null;
   go: Go;
-  notice: (s: string) => void;
+  notice: NoticeFn;
   page: number;
 }) {
   const list = useLoad<Run[]>("/runs");
@@ -1207,11 +1273,11 @@ function MatchPage({
             <div>
               <span className="eyebrow">{detail.data.job_snapshot.title}</span>
               <h2>
-                {detail.data.candidate_count} profiles, one set of job
+                {plural(detail.data.candidate_count, "profile")}, one set of job
                 requirements.
               </h2>
               <span className="small muted">
-                {method(detail.data.method)} · Job requirements version
+                {method(detail.data.method)} · Job requirements version{" "}
                 {detail.data.job_snapshot.version}
               </span>
             </div>
@@ -1683,7 +1749,11 @@ function App() {
   const [user, setUser] = useState<User | null>(null);
   const [checking, setChecking] = useState(true);
   const [route, setRoute] = useState(new URLSearchParams(location.search));
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState<{
+    text: string;
+    error: boolean;
+  } | null>(null);
+  const notify: NoticeFn = (text, error = false) => setMessage({ text, error });
   const [dirty, setDirty] = useState(false);
   const dirtyRef = useRef(false);
   const routeRef = useRef(location.href);
@@ -1765,11 +1835,11 @@ function App() {
         await api("/auth/logout", { method: "POST" });
         setUser(null);
         setDraft(false);
-        setMessage("");
+        setMessage(null);
         history.replaceState(null, "", location.pathname);
         setRoute(new URLSearchParams());
       } catch (e) {
-        setMessage((e as Error).message);
+        setMessage({ text: (e as Error).message, error: true });
       }
     };
     if (dirtyRef.current) setPending(() => action);
@@ -1839,6 +1909,7 @@ function App() {
         : [
             "jobs",
             "job-new",
+            "job-edit",
             "candidates",
             "profile",
             "matches",
@@ -1849,6 +1920,10 @@ function App() {
           ];
   const page = Math.max(1, Number(route.get("page")) || 1);
   const q = route.get("q") || "";
+  const isActive = (id: string) =>
+    view === id ||
+    (id === "candidates" && (view === "profile" || view === "profile-new")) ||
+    (id === "jobs" && (view === "job-new" || view === "job-edit"));
   return (
     <div className="app-shell">
       <aside className="sidebar">
@@ -1872,13 +1947,8 @@ function App() {
           {nav.map((n) => (
             <a
               href={`?view=${n.id}`}
-              className={
-                view.startsWith(n.id === "candidates" ? "profile" : n.id) ||
-                view === n.id
-                  ? "active"
-                  : ""
-              }
-              aria-current={view === n.id ? "page" : undefined}
+              className={isActive(n.id) ? "active" : ""}
+              aria-current={isActive(n.id) ? "page" : undefined}
               key={n.id}
               onClick={(e) => {
                 e.preventDefault();
@@ -1927,10 +1997,14 @@ function App() {
         </div>
         <div className="page-content">
           {message && (
-            <Notice message={message} onClose={() => setMessage("")} />
+            <Notice
+              message={message.text}
+              error={message.error}
+              onClose={() => setMessage(null)}
+            />
           )}
           <div className="sr-only" aria-live="polite">
-            {message}
+            {message?.text}
           </div>
           {!allowed.includes(view) ? (
             <Panel>
@@ -1954,9 +2028,16 @@ function App() {
           ) : view === "evaluations" ? (
             <Evaluations user={user} setDirty={setDraft} />
           ) : view === "jobs" ? (
-            <Jobs go={go} user={user} q={q} page={page} notice={setMessage} />
+            <Jobs go={go} user={user} q={q} page={page} notice={notify} />
           ) : view === "job-new" ? (
-            <JobForm go={go} setDirty={setDraft} notice={setMessage} />
+            <JobForm go={go} setDirty={setDraft} notice={notify} />
+          ) : view === "job-edit" ? (
+            <JobEdit
+              ident={route.get("id")}
+              go={go}
+              setDirty={setDraft}
+              notice={notify}
+            />
           ) : view === "candidates" ? (
             <Candidates go={go} page={page} q={q} user={user} />
           ) : view === "profile" || view === "profile-new" ? (
@@ -1965,13 +2046,13 @@ function App() {
               ident={view === "profile" ? route.get("id") : null}
               go={go}
               setDirty={setDraft}
-              notice={setMessage}
+              notice={notify}
             />
           ) : view === "matches" ? (
             <MatchPage
               selectedRun={route.get("run")}
               go={go}
-              notice={setMessage}
+              notice={notify}
               page={page}
             />
           ) : view === "audit" ? (

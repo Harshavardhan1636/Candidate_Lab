@@ -3,8 +3,9 @@
 The user authorized implementing the major-project blueprint. This first release is a local research application for job-related matching support, not autonomous hiring or rejection. No real applicant dataset or independently labeled training corpus has been supplied.
 
 ## Decisions
+
 - Display names use readable job titles and professional profile names; raw database identifiers and generated timestamp suffixes are not titles. Renaming known test/sample names preserves record IDs and evidence history. Historical screens resolve current display names while retaining recorded profile versions, text and scores. Browser tests run on port 8001 with a fresh disposable database; the live workspace on port 8000 is not test storage.
-- Version 0.2 adds explicit job publication, candidate-owned applications with immutable submitted-profile snapshots, reversible withdrawal and revision history. New matching runs use only active applications; legacy runs remain unchanged. Closed jobs reject new submissions. Users withdraw and resubmit to update an application; editing a profile alone does not change the submission.
+- Version 0.2 adds explicit job publication, editable job rubrics with optimistic version checks, candidate-owned applications with immutable submitted-profile snapshots, and application revision history. New matching runs use only active applications; legacy runs remain unchanged. Closed jobs reject new submissions. Withdrawal/resubmission is retired and its old endpoint returns 410; editing a profile alone does not change an existing submission.
 - Contextual evidence v2 flags supported, learning, negated, uncertain and not-found mentions. Only supported mentions earn coverage points. Rules are conservative and require human verification; semantic alignment uses a locally cached pretrained model, not a recruitment-fine-tuned predictor.
 - Recruiters can compare same-job snapshots and run labelled-dataset evaluations (NDCG, recall and precision at k). Dataset hash, vocabulary hash and semantic model revision are retained. Auditors receive aggregate metrics without individual ranked evaluation examples. The included illustrative fixture is synthetic and does not validate real applicant performance.
 - New candidates can self-register. New recruiters/auditors must redeem a single-use, expiring invitation tied to their email and role; only a trusted local administrator can generate invitations via backend.invite. Registration returns to login. Email verification/recovery and tenant isolation are outside this local release. An account cannot self-upgrade its role.
@@ -19,16 +20,19 @@ The user authorized implementing the major-project blueprint. This first release
 - Human review statuses are needs_review, shortlisted, and more_information. These are reversible internal review labels with an append-only reason record, not employment decisions.
 
 ## Candidate-controlled profiles
+
 Candidates create and update their own profiles. Recruiters can browse and inspect resume evidence and extracted skills but cannot create or edit profiles. The API enforces this restriction independently of the interface. Existing profiles and historical matching evidence are retained.
 
 ## Recruitment decisions update
+
 Recruiter → Applications → Review application → choose Under review, Accept for next stage, or Reject application → enter job-related candidate-visible feedback → Save recruitment decision. Accepting progresses the application; it is not a job offer. Candidates see status and dated feedback in Applications. Each decision records the recruiter, time and revision; stale revisions are rejected. Decisions do not overwrite submitted resume evidence or matching scores.
 
-Candidate withdrawal and resubmission are superseded by this workflow: the interface no longer offers withdrawal, its old API returns 410, and duplicate applications are rejected. Previously withdrawn records remain historical records. Rejected applications are excluded from future matching runs; submitted, under-review and accepted applications remain eligible. Older saved matching runs retain their original results. Earlier withdrawal/resubmission descriptions in this document describe the previous release.
+Candidate withdrawal and resubmission are superseded by this workflow: the interface no longer offers withdrawal, its old API returns 410, and duplicate applications are rejected. Previously withdrawn records remain historical records. Rejected applications are excluded from future matching runs; submitted, under-review and accepted applications remain eligible. Older saved matching runs retain their original results.
 
 Recruiter decisions remain separate from matching-evidence review notes. No automatic recruitment decision or email delivery is performed. Status updates are visible inside the application. Existing data is retained; startup adds the recruitment_decisions table without changing existing table columns.
 
 ## Application review with matching evidence
+
 Applications → Review application loads the exact submitted resume and a saved matching snapshot for that application, submitted version and current job-requirements version. The review displays score, method, date and skill evidence. Without a matching snapshot, a decision cannot be saved; open job matching first. Scores are evidence summaries, not probabilities of recruitment success.
 
 Feedback is now generated by the server from that saved evidence and the recruiter-selected status. The manual feedback field is removed. Candidates receive the score, supported skills and required skills needing clearer evidence, with context limitations and the recruiter decision. No email is sent. A new additive decision_evidence table links each new decision to its frozen matching snapshot; later matching/profile changes do not rewrite existing feedback. Manual feedback from earlier releases remains historical. Recruiters retain control of decisions; feedback generation does not auto-select or reject people. This supersedes earlier instructions to type candidate feedback.

@@ -80,7 +80,7 @@ test("candidate evidence gap, application update and snapshot comparison", async
   ).toHaveCount(0);
   await page.getByRole("button", { name: "View application status" }).click();
   await expect(
-    page.getByText("Awaiting recruiter response", { exact: true }),
+    page.getByText("Awaiting recruiter response", { exact: true }).first(),
   ).toBeVisible();
   await page.getByRole("button", { name: "Sign out" }).click();
   await login(page);

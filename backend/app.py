@@ -7,7 +7,7 @@ import secrets
 import time
 import zipfile
 from contextlib import asynccontextmanager
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Literal
 
@@ -203,6 +203,7 @@ def seed(session):
             Job(title="Frontend Engineer", description="Build accessible web interfaces and maintain a tested component system.", required=["React", "TypeScript", "HTML", "CSS"], preferred=["Testing", "Git"]),
             Job(title="Data Analyst", description="Investigate product questions and communicate findings with clear visual evidence.", required=["SQL", "Pandas", "Statistics"], preferred=["Python", "Data Visualization", "Excel"])]
     session.add_all(jobs)
+    session.flush()
     samples = [
         "Built REST APIs with Python and FastAPI for an inventory service. Wrote pytest integration tests and used PostgreSQL. Containerized the service with Docker and maintained Git workflows.",
         "Developed Python ETL pipelines using SQL and PostgreSQL. Added unit tests for data validation. Used Git for reviews and wrote technical documentation.",
@@ -217,17 +218,38 @@ def seed(session):
         "Designed TypeScript and React forms with CSS and HTML. Added unit tests and Git reviews. Integrated Node.js REST APIs.",
         "Developed Python services and SQL migration scripts. Built REST endpoints and integration tests. Used FastAPI with PostgreSQL and Docker.",
     ]
+    people = []
     for i, text in enumerate(samples):
         c = Candidate(owner_id=users[2].id if i == 0 else users[0].id, label=SAMPLE_PROFILES[i], text=text, skills=extract(text)["skills"], warnings=[], synthetic=True)
         session.add(c)
         session.flush()
         session.add(ProfileVersion(candidate_id=c.id, version=1, text=text))
         session.add(AuditAttribute(candidate_id=c.id, group="Cohort A" if i % 2 == 0 else "Cohort B"))
+        people.append(c)
+    from .advanced import Application, ApplicationVersion, Publication, submitted_profiles
+    recruiter, candidate_user = users[0], users[2]
+    session.add(Publication(job_id=jobs[0].id, published=True, updated=now()))
+    application = Application(job_id=jobs[0].id, owner_id=candidate_user.id, candidate_id=people[0].id,
+        snapshot={"label": people[0].label, "text": people[0].text, "version": people[0].version, "warnings": people[0].warnings},
+        status="active", revision=1)
+    session.add(application)
+    session.flush()
+    session.add(ApplicationVersion(application_id=application.id, revision=1, snapshot=application.snapshot, status="active"))
+    audit(session, recruiter, "Published job", jobs[0].id)
+    audit(session, candidate_user, "Submitted job application", application.id)
     session.commit()
-    people = session.scalars(select(Candidate).order_by(Candidate.label)).all()
-    results, method = rank(jobs[0], people)
-    session.add(Run(job_id=jobs[0].id, job_snapshot=job_out(jobs[0]), results=results, method=method))
-    audit(session, users[0], "Synthetic workspace initialized", jobs[0].id)
+    legacy_results, legacy_method = rank(jobs[0], people)
+    session.add(Run(job_id=jobs[0].id, job_snapshot={**job_out(jobs[0]), "scope": "all_profiles"},
+                    results=legacy_results, method=legacy_method,
+                    created=(datetime.now(timezone.utc) - timedelta(days=2)).isoformat()))
+    applicants = submitted_profiles(session, jobs[0].id)
+    scoped_results, scoped_method = rank(jobs[0], applicants)
+    session.add(Run(job_id=jobs[0].id,
+                    job_snapshot={**job_out(jobs[0]), "scope": "active_applications",
+                                  "application_ids": [p.application_id for p in applicants],
+                                  "matching_config": matching_config("tfidf")},
+                    results=scoped_results, method=scoped_method))
+    audit(session, recruiter, "Synthetic workspace initialized", jobs[0].id)
     session.commit()
 
 @asynccontextmanager
@@ -384,6 +406,13 @@ def jobs(page: int = Query(1, ge=1), q: str = Query("", max_length=100), user: U
     count = session.scalar(select(func.count()).select_from(query.subquery()))
     return {"items": [job_out(j) for j in session.scalars(query.offset((page-1)*10).limit(10))], "total": count}
 
+@app.get("/api/jobs/{ident}")
+def get_job(ident: str, user: User = Depends(role("recruiter", "auditor")), session: Session = Depends(db)):
+    j = session.get(Job, ident)
+    if not j:
+        raise HTTPException(404, "Job not found.")
+    return job_out(j)
+
 @app.post("/api/jobs", status_code=201)
 def create_job(body: JobIn, user: User = Depends(role("recruiter")), session: Session = Depends(db)):
     if not body.required:
@@ -394,6 +423,28 @@ def create_job(body: JobIn, user: User = Depends(role("recruiter")), session: Se
     session.add(j)
     session.flush()
     audit(session, user, "Created job rubric", j.id)
+    session.commit()
+    return job_out(j)
+
+class JobUpdateIn(JobIn):
+    version: int = Field(ge=1)
+
+@app.put("/api/jobs/{ident}")
+def update_job(ident: str, body: JobUpdateIn, user: User = Depends(role("recruiter")), session: Session = Depends(db)):
+    j = session.get(Job, ident)
+    if not j:
+        raise HTTPException(404, "Job not found.")
+    if body.version != j.version:
+        raise HTTPException(409, "This job rubric changed. Reload before saving to avoid overwriting a newer version.")
+    if set(x.casefold() for x in body.required) & set(x.casefold() for x in body.preferred):
+        raise HTTPException(422, "A skill cannot be both required and preferred.")
+    changed = session.execute(update(Job).where(Job.id == ident, Job.version == body.version).values(
+        title=body.title, description=body.description, required=body.required, preferred=body.preferred, version=body.version + 1
+    ))
+    if changed.rowcount != 1:
+        raise HTTPException(409, "This job rubric changed. Reload before saving.")
+    session.refresh(j)
+    audit(session, user, "Updated job rubric", j.id)
     session.commit()
     return job_out(j)
 
@@ -575,6 +626,13 @@ from . import advanced  # Registers additive tables and new endpoints before sta
 
 if (ROOT / "dist" / "assets").exists():
     app.mount("/assets", StaticFiles(directory=ROOT / "dist" / "assets"), name="assets")
+
+@app.get("/favicon.svg", include_in_schema=False)
+def favicon():
+    path = ROOT / "dist" / "favicon.svg"
+    if path.exists():
+        return FileResponse(path)
+    raise HTTPException(404, "Not found")
 
 @app.get("/", include_in_schema=False)
 def frontend():

@@ -34,7 +34,7 @@ type Application = {
 };
 const applicationStatus = (status: string) =>
   ({
-    active: "Submitted � awaiting review",
+    active: "Submitted · awaiting review",
     under_review: "Under review",
     accepted: "Accepted for next stage",
     rejected: "Not selected",

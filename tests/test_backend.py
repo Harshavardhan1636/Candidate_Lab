@@ -49,12 +49,22 @@ def test_complete_matching_and_snapshot_flow(client):
     assert response.status_code == 201
     job = response.json()
     assert job["required"] == ["Python", "SQL"]
+    loaded = client.get(f"/api/jobs/{job['id']}")
+    assert loaded.status_code == 200 and loaded.json()["version"] == 1
+    updated_job = {**job_data, "title": "Test engineer II", "version": 1}
+    edited = client.put(f"/api/jobs/{job['id']}", json=updated_job)
+    assert edited.status_code == 200 and edited.json()["version"] == 2
+    assert edited.json()["title"] == "Test engineer II"
+    assert client.put(f"/api/jobs/{job['id']}", json=updated_job).status_code == 409
+    assert client.put("/api/jobs/missing", json=updated_job).status_code == 404
     assert client.put(f"/api/jobs/{job['id']}/publication", json={'published':True}).status_code == 200
     login(client, 'candidate')
     profile = client.post("/api/candidates", json={"label": "Test profile", "text": TEXT}).json()
     assert profile["version"] == 1
+    assert client.put(f"/api/jobs/{job['id']}", json={**updated_job, "version": 2}).status_code == 403
     assert client.post(f"/api/jobs/{job['id']}/applications", json={'candidate_id':profile['id']}).status_code == 201
     login(client)
+    assert client.get(f"/api/jobs/{job['id']}").json()["version"] == 2
     result = client.post(f"/api/jobs/{job['id']}/runs")
     assert result.status_code == 201
     run = result.json()
@@ -134,7 +144,7 @@ def test_overview_uses_persisted_counts_and_role_boundaries(client):
     assert client.get('/api/overview').status_code == 401
     login(client)
     counts = client.get('/api/overview').json()
-    assert counts == {'jobs': 3, 'profiles': 12, 'runs': 1, 'reviews': 0, 'sample_profiles': 12}
+    assert counts == {'jobs': 3, 'profiles': 12, 'runs': 2, 'reviews': 0, 'sample_profiles': 12}
     login(client, 'candidate')
     client.post('/api/candidates', json={'label': 'Overview test profile', 'text': TEXT})
     login(client)

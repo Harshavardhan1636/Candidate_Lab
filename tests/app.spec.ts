@@ -24,6 +24,20 @@ test("recruiter creates, corrects, matches and reviews evidence", async ({
   await expect(
     page.getByRole("heading", { name: "Recruitment overview" }),
   ).toBeVisible();
+  await page.getByRole("link", { name: "Job details" }).click();
+  await page.getByRole("button", { name: "Edit", exact: true }).first().click();
+  await expect(page.getByRole("link", { name: "Job details" })).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
+  await expect(page.getByLabel("Job title")).toHaveValue(
+    "Python Backend Engineer",
+  );
+  await page.getByLabel("Job title").fill("Python Backend Engineer II");
+  await page.getByRole("button", { name: "Save job", exact: true }).click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Job requirements updated" }),
+  ).toBeVisible();
   await page.getByRole("link", { name: "Candidate profiles" }).click();
   await expect(page.getByRole("button", { name: "Add profile" })).toHaveCount(
     0,

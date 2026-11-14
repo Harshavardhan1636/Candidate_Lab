@@ -663,6 +663,12 @@ small,
   max-width: 660px;
   margin: 7px 0 12px;
 }
+.job-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
 .chips {
   display: flex;
   align-items: center;
@@ -1365,7 +1371,8 @@ dialog p {
   .job-row {
     gap: 12px;
   }
-  .job-row > .button {
+  .job-row > .button,
+  .job-row > .job-actions {
     font-size: 11px;
     padding: 8px 11px;
   }
@@ -1488,7 +1495,8 @@ dialog p {
   .job-content {
     flex-basis: calc(100% - 66px);
   }
-  .job-row > .button {
+  .job-row > .button,
+  .job-row > .job-actions {
     margin-left: 64px;
   }
   .snapshot {

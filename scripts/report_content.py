@@ -8,8 +8,8 @@ tables, discussion and the complete set of design diagrams.
 from __future__ import annotations
 
 TITLE = (
-    "CANDIDATE LAB: FAIR AND EXPLAINABLE MACHINE LEARNING FOR "
-    "AUTOMATED CANDIDATE SELECTION AND SKILL MATCHING"
+    "CANDIDATE LAB: AN EXPLAINABLE AL FRAMEWORK FOR FAIR AND OBJECTIVE "
+    "TALENT ACQUISITION"
 )
 SHORT_TITLE = "Candidate Lab"
 STUDENTS = [

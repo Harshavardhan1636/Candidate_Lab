@@ -53,6 +53,9 @@ CONTENT_WIDTH_CM = PAGE_WIDTH_CM - MARGIN_LEFT_CM - MARGIN_RIGHT_CM
 BLACK = RGBColor(0x00, 0x00, 0x00)
 NAVY = RGBColor(0x1F, 0x38, 0x64)
 RED = RGBColor(0xC0, 0x00, 0x00)
+COVER_NAVY = RGBColor(0x1F, 0x49, 0x7D)
+COVER_RED = RGBColor(0xFF, 0x00, 0x00)
+COVER_DARK_NAVY = RGBColor(0x00, 0x1F, 0x5F)
 GREY = "D9D9D9"
 FONT = "Times New Roman"
 
@@ -167,6 +170,28 @@ def configure_section(section) -> None:
     section.right_margin = Cm(MARGIN_RIGHT_CM)
     section.header_distance = Cm(1.27)
     section.footer_distance = Cm(1.27)
+
+
+def compact_section_break(paragraph) -> None:
+    """Make the empty section-break paragraph occupy almost no vertical space."""
+    paragraph.paragraph_format.space_before = Pt(0)
+    paragraph.paragraph_format.space_after = Pt(0)
+    paragraph.paragraph_format.line_spacing = Pt(1)
+    p_pr = paragraph._p.get_or_add_pPr()
+    r_pr = p_pr.find(qn("w:rPr"))
+    if r_pr is None:
+        r_pr = OxmlElement("w:rPr")
+        sect_pr = p_pr.find(qn("w:sectPr"))
+        if sect_pr is not None:
+            sect_pr.addprevious(r_pr)
+        else:
+            p_pr.append(r_pr)
+    for tag in ("w:sz", "w:szCs"):
+        size = r_pr.find(qn(tag))
+        if size is None:
+            size = OxmlElement(tag)
+            r_pr.append(size)
+        size.set(qn("w:val"), "2")
 
 
 def add_toc_field(doc, levels: str = "1-2") -> None:
@@ -499,79 +524,123 @@ def add_figure(
 # ---------------------------------------------------------------------------
 
 
-def cover_line(
-    doc,
-    text: str,
-    size: float,
-    color: RGBColor = BLACK,
-    bold: bool = False,
-    italic: bool = False,
-    before: float = 0,
-    after: float = 0,
-) -> None:
+COVER_TITLE_LINES = (
+    "CANDIDATE LAB: AN EXPLAINABLE AL FRAMEWORK",
+    "FOR FAIR AND OBJECTIVE TALENT ACQUISITION",
+)
+assert " ".join(COVER_TITLE_LINES) == TITLE, "Cover title lines must match TITLE"
+
+
+def cover_line(doc, segments, before: float = 0, after: float = 0) -> None:
+    """Add one centred cover line.
+
+    ``segments`` is a sequence of ``(text, size, colour, bold, italic)`` so a
+    single line can mix colours and weights exactly as the reference does.
+    """
     paragraph = doc.add_paragraph()
     paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
     paragraph.paragraph_format.space_before = Pt(before)
     paragraph.paragraph_format.space_after = Pt(after)
     paragraph.paragraph_format.line_spacing = 1.0
-    add_rich(paragraph, text, size=size, bold=bold, italic=italic, color=color)
+    paragraph.paragraph_format.widow_control = False
+    for text, size, color, bold, italic in segments:
+        run = paragraph.add_run(text)
+        style_run(run, size=size, bold=bold, italic=italic, color=color)
 
 
 def add_cover(doc) -> None:
-    banner = doc.add_paragraph()
-    banner.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    banner.paragraph_format.space_before = Pt(0)
-    banner.paragraph_format.space_after = Pt(4)
-    banner.add_run().add_picture(str(ASSETS / "image2.jpeg"), width=Cm(12.6))
-
-    cover_line(doc, "A Project Stage-1 Report", 12, NAVY, bold=True, italic=True, after=2)
-    cover_line(doc, "On", 11, NAVY, bold=True, italic=True, after=8)
-    cover_line(doc, TITLE, 14, RED, bold=True, after=10)
     cover_line(
         doc,
-        "Submitted in partial fulfilment for the award of the Degree of",
-        11,
-        NAVY,
-        bold=True,
-        italic=True,
-        after=6,
+        [
+            ("A Project", 14, BLACK, True, True),
+            (" Stage-1 Report", 14, COVER_NAVY, True, True),
+        ],
+        before=25.41,
     )
-    cover_line(doc, "BACHELOR OF TECHNOLOGY", 13, RED, bold=True, after=3)
-    cover_line(doc, "In", 10.5, BLACK, italic=True, after=3)
-    cover_line(doc, "COMPUTER SCIENCE & ENGINEERING", 13, RED, bold=True, after=3)
+    cover_line(doc, [("On", 14, BLACK, True, True)], before=11.12)
+    cover_line(
+        doc, [(COVER_TITLE_LINES[0], 14, COVER_RED, True, False)], before=9.22
+    )
+    cover_line(
+        doc, [(COVER_TITLE_LINES[1], 14, COVER_RED, True, False)], before=0.02
+    )
     cover_line(
         doc,
-        "(Artificial Intelligence & Machine Learning)",
-        11.5,
-        RED,
-        bold=True,
-        after=6,
+        [
+            (
+                "Submitted In partial fulfilment for the award of the Degree of",
+                14,
+                COVER_NAVY,
+                True,
+                True,
+            )
+        ],
+        before=13.20,
     )
-    cover_line(doc, "by", 10.5, BLACK, italic=True, after=3)
-    for name, roll in STUDENTS:
-        cover_line(doc, f"{name}  ({roll})", 11.2, RED, bold=True, italic=True, after=1)
-    cover_line(doc, "Under the guidance of", 10, NAVY, bold=True, italic=True, before=6, after=4)
-    cover_line(doc, GUIDE, 11.2, RED, bold=True, after=1)
-    cover_line(doc, GUIDE_DESIGNATION, 10.5, RED, after=4)
+    cover_line(
+        doc, [("BACHELOR OF TECHNOLOGY", 14, COVER_RED, True, False)], before=13.32
+    )
+    cover_line(doc, [("In", 14, BLACK, True, True)], before=0.12)
+    cover_line(
+        doc,
+        [("COMPUTER SCIENCE & ENGINEERING", 14, COVER_RED, True, False)],
+        before=11.02,
+    )
+    cover_line(
+        doc,
+        [("(Artificial Intelligence & Machine Learning)", 14, COVER_RED, True, False)],
+        before=11.02,
+    )
+    cover_line(
+        doc,
+        [("b", 16, BLACK, True, True), ("y", 13, BLACK, True, True)],
+        before=9.53,
+    )
+    name_spacing = (9.28, 9.52, 9.42, 9.52)
+    for (name, roll), before in zip(STUDENTS, name_spacing):
+        cover_line(
+            doc,
+            [(f"{name.upper()} ({roll})", 14, COVER_RED, True, True)],
+            before=before,
+        )
+    cover_line(
+        doc, [("Under the guidance of", 12, COVER_NAVY, True, False)], before=25.62
+    )
+    cover_line(doc, [(GUIDE, 14, COVER_RED, False, False)], before=9.20)
+    cover_line(doc, [(GUIDE_DESIGNATION, 14, COVER_RED, False, False)], before=9.22)
 
     logo = doc.add_paragraph()
     logo.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    logo.paragraph_format.space_before = Pt(2)
-    logo.paragraph_format.space_after = Pt(4)
-    logo.add_run().add_picture(str(ASSETS / "image1.jpeg"), width=Cm(2.0))
+    logo.paragraph_format.space_before = Pt(10.29)
+    logo.paragraph_format.space_after = Pt(0)
+    logo.paragraph_format.line_spacing = 1.0
+    logo.add_run().add_picture(str(ASSETS / "image1.jpeg"), width=Cm(2.55))
 
-    cover_line(doc, "DEPARTMENT OF " + DEPARTMENT, 10, BLACK, bold=True, after=3)
-    cover_line(doc, COLLEGE, 14, RED, bold=True, after=1)
-    cover_line(doc, "(An Autonomous Institution)", 10, RED, after=2)
     cover_line(
         doc,
-        "Approved by AICTE, Accredited by NAAC, NBA & permanently Affiliated to JNTUH",
-        8.2,
-        NAVY,
-        bold=True,
-        after=4,
+        [("DEPARTMENT OF " + DEPARTMENT, 12, BLACK, True, False)],
+        before=13.46,
     )
-    cover_line(doc, YEAR, 10.5, BLACK, bold=True)
+    cover_line(doc, [(COLLEGE, 16, COVER_RED, True, False)], before=13.81)
+    cover_line(
+        doc,
+        [("(An Autonomous Institution)", 16, COVER_RED, False, False)],
+        before=0.14,
+    )
+    cover_line(
+        doc,
+        [
+            (
+                "Approved by AICTE, Accredited by NAAC, NBA & permanently Affiliated to JNTUH",
+                12,
+                COVER_DARK_NAVY,
+                True,
+                False,
+            )
+        ],
+        before=10.81,
+    )
+    cover_line(doc, [(YEAR, 12, BLACK, True, False)], before=12.90)
 
 
 def add_certificate(doc) -> None:
@@ -765,12 +834,14 @@ def build(variant: str) -> Path:
     doc.core_properties.subject = TITLE
     doc.core_properties.comments = f"Project Stage-1 report, Department of CSE (AI&ML), VJIT ({variant} edition)."
 
-    # Cover: no page number.
-    doc.sections[0].footer.is_linked_to_previous = False
+    # Cover: no footer, and a smaller bottom margin so the year line can sit at
+    # the reference position without spilling onto a second page.
     add_cover(doc)
+    doc.sections[0].bottom_margin = Cm(0.9)
 
     # Front matter: lower-case Roman numerals starting at ii.
     front = doc.add_section(WD_SECTION.NEW_PAGE)
+    compact_section_break(doc.paragraphs[-1])
     configure_section(front)
     front.footer.is_linked_to_previous = False
     front.footer.paragraphs[0].text = ""

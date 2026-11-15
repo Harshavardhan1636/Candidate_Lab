@@ -64,6 +64,10 @@ OUTPUTS = {
     "detailed": ROOT / "docs" / "report" / "Candidate_Lab_Project_Report_Detailed.docx",
 }
 
+# Version 2 tightens figure/caption spacing so all seven enlarged diagrams still
+# fit; the default keeps the original Version 1 layout reproducible.
+TIGHT_FIGURE_SPACING = False
+
 
 # ---------------------------------------------------------------------------
 # Low-level XML and style helpers
@@ -511,12 +515,20 @@ def add_figure(
 
     paragraph = doc.add_paragraph()
     paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    paragraph.paragraph_format.space_before = Pt(4)
-    paragraph.paragraph_format.space_after = Pt(2)
+    if TIGHT_FIGURE_SPACING:
+        image_before, image_after = 2, 0
+        caption_before, caption_after = 2, 4
+    else:
+        image_before, image_after = 4, 2
+        caption_before, caption_after = 3, 6
+    paragraph.paragraph_format.space_before = Pt(image_before)
+    paragraph.paragraph_format.space_after = Pt(image_after)
     paragraph.paragraph_format.keep_with_next = True
     paragraph.add_run().add_picture(str(path), width=Cm(width))
 
     cap = doc.add_paragraph(style="Caption")
+    cap.paragraph_format.space_before = Pt(caption_before)
+    cap.paragraph_format.space_after = Pt(caption_after)
     add_rich(cap, caption, size=10, italic=True)
 
 

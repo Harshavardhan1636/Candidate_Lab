@@ -1,5 +1,6 @@
 param(
-    [string[]]$Editions = @('standard', 'detailed')
+    [string[]]$Editions = @('standard', 'detailed'),
+    [string]$Suffix = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -62,13 +63,13 @@ try {
     $word.ScreenUpdating = $false
 
     foreach ($edition in $Editions) {
-        $suffix = (Get-Culture).TextInfo.ToTitleCase($edition)
-        $docx = Join-Path $reportDir "Candidate_Lab_Project_Report_$suffix.docx"
-        $pdf = Join-Path $reportDir "Candidate_Lab_Project_Report_$suffix.pdf"
+        $editionName = (Get-Culture).TextInfo.ToTitleCase($edition)
+        $docx = Join-Path $reportDir "Candidate_Lab_Project_Report_$editionName$Suffix.docx"
+        $pdf = Join-Path $reportDir "Candidate_Lab_Project_Report_$editionName$Suffix.pdf"
         if (-not (Test-Path -LiteralPath $docx)) {
             throw "Missing report document: $docx"
         }
-        Export-Edition -Edition $suffix -Docx $docx -Pdf $pdf
+        Export-Edition -Edition $editionName -Docx $docx -Pdf $pdf
     }
 }
 finally {

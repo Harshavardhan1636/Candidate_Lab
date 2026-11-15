@@ -371,7 +371,8 @@ def add_chapter(doc, number: int, title: str, first: bool = False) -> None:
     paragraph.paragraph_format.page_break_before = not first
     paragraph.paragraph_format.space_before = Pt(0)
     paragraph.paragraph_format.space_after = Pt(16)
-    add_rich(paragraph, f"CHAPTER {number}  {title.upper()}", size=16, bold=True)
+    add_rich(paragraph, f"CHAPTER {number}", size=16, bold=True)
+    add_rich(paragraph, "\n" + title.upper(), size=16, bold=True)
 
 
 def add_section_heading(doc, text: str) -> None:

@@ -46,29 +46,31 @@ ACKNOWLEDGEMENT = [
 ]
 
 ABSTRACT = [
-    "Candidate screening requires a reviewer to connect the skills described in a resume with the "
-    "skills required by a job. Resumes differ in structure, vocabulary and detail; job descriptions "
-    "mix essential requirements with desirable qualifications; and a score without visible evidence "
-    "is difficult to interpret, reproduce or challenge. Candidate Lab is a local, role-aware "
-    "decision-support application that addresses this inspectability problem through document "
-    "extraction, explicit skill rubrics, evidence-linked matching, immutable snapshots, candidate "
-    "applications, recruiter decisions and a restricted aggregate audit view.",
-    "Candidate profiles are parsed from text PDF, DOCX or TXT files, or pasted text, and are "
-    "previewed and corrected before saving. A context-aware dictionary identifies supported, "
-    "learning, uncertain and negated skill mentions and retains the supporting passage. Matching "
-    "combines required-skill coverage (60%), preferred-skill coverage (15%) and lexical alignment "
-    "(25%), or 75% required coverage when no preferred skills exist. Every component is shown as an "
-    "exact arithmetic contribution. A pinned local Sentence Transformers model can replace lexical "
-    "alignment when explicitly configured; the default method is skill-tfidf-v2 with "
-    "context-rules-v2.",
-    "The prototype separates candidate, recruiter and auditor access at the server boundary. "
-    "Candidates manage owned profiles and applications; recruiters publish jobs, inspect evidence "
-    "and record reasoned decisions; auditors see aggregate cohort rates, Wilson intervals and "
-    "activity records without receiving resume text or ranking snapshots. Verification covers 26 "
-    "backend tests and 9 production-build browser journeys, together with type checking, linting "
-    "and a production build. The project does not claim a trained hiring predictor, measured "
-    "hiring accuracy or real-world fairness; its contribution is an inspectable baseline and an "
-    "honest evaluation frame.",
+    "The increasing use of Artificial Intelligence (AI) and Machine Learning (ML) in recruitment "
+    "has created opportunities to automate resume analysis and improve talent assessment. "
+    "However, conventional automated recruitment systems often rely on keyword-based evaluation, "
+    "which may overlook relevant candidate skills expressed using different terminology. "
+    "Furthermore, such systems may produce biased outcomes and provide limited explanations for "
+    "their assessments, making it difficult for recruiters to understand and verify the basis of "
+    "their decisions. To address these challenges, this project proposes a Fair and Explainable "
+    "AI Framework for Evidence-Based Talent Acquisition, an intelligent recruitment support "
+    "system designed to evaluate candidate qualifications through relevant skills, experience, "
+    "and supporting resume evidence.",
+    "The proposed framework integrates Natural Language Processing (NLP) techniques for resume "
+    "parsing, skill extraction, and skill normalization with Machine Learning approaches for "
+    "candidate-job relevance assessment. TF-IDF and cosine similarity are employed as baseline "
+    "techniques to calculate relevance scores, while semantic similarity techniques can be "
+    "incorporated to identify contextually related skills. The system provides interpretable "
+    "score breakdowns and supporting resume passages, enabling recruiters to understand how each "
+    "assessment is generated. Additionally, a fairness evaluation module examines differences in "
+    "assessment and selection rates across predefined demographic or synthetic cohorts using "
+    "appropriate fairness metrics. The framework also maintains versioned candidate profiles, "
+    "matching records, and an audit trail to support transparency and traceability. A "
+    "human-in-the-loop approach ensures that the system provides decision support rather than "
+    "independently making employment decisions. The expected outcome is a transparent, "
+    "explainable, and fairness-aware recruitment support framework that improves the consistency "
+    "of candidate assessment, helps identify relevant talent, and promotes accountable "
+    "decision-making in recruitment processes.",
 ]
 
 REFERENCES = [
@@ -398,7 +400,7 @@ def _standard_blocks() -> list:
             "receives only the rubric and submitted snapshot. Figure 3.1 shows the layers; the "
             "remaining design models appear in the Detailed edition.",
         ),
-        ("figure", "architecture.png", "Figure 3.1: Layered architecture of Candidate Lab", 7.8, 5.6),
+        ("figure", "architecture.png", "Figure 3.1: Layered architecture of Candidate Lab", 9.8, 7.0),
         ("section", "3.3 Proposed Methodology"),
         ("subsection", "3.3.1 Matching and Scoring Method"),
         (
@@ -423,7 +425,7 @@ def _standard_blocks() -> list:
             "diagram treats Candidate Lab as one process with candidate, recruiter and auditor "
             "entities. The Detailed edition reproduces all seven diagrams.",
         ),
-        ("figure", "dfd_level0.png", "Figure 3.2: Level-0 data-flow diagram (context)", 8.8, 5.6),
+        ("figure", "dfd_level0.png", "Figure 3.2: Level-0 data-flow diagram (context)", 11.5, 6.4),
         ("subsection", "3.3.3 Design Walkthrough"),
         (
             "body",
@@ -738,7 +740,7 @@ def _detailed_blocks() -> list:
             "the required role before a service is called; the ranking path receives only the rubric "
             "and submitted snapshot. Figure 3.1 shows the layers.",
         ),
-        ("figure", "architecture.png", "Figure 3.1: Layered architecture of Candidate Lab", 9.2, 6.2),
+        ("figure", "architecture.png", "Figure 3.1: Layered architecture of Candidate Lab", 11.0, 7.0),
         ("section", "3.3 Proposed Methodology"),
         ("subsection", "3.3.1 Matching and Scoring Method"),
         (
@@ -782,12 +784,12 @@ def _detailed_blocks() -> list:
             "movement; the class diagram shows durable records; the sequence and state models show "
             "time and lifecycle; and the activity model shows the human workflow.",
         ),
-        ("figure", "dfd_level0.png", "Figure 3.2: Level-0 data-flow diagram (context)", 9.0, 5.6),
-        ("figure", "dfd_level1.png", "Figure 3.3: Level-1 data-flow diagram", 9.0, 5.8),
-        ("figure", "class_diagram.png", "Figure 3.4: Class diagram of the persistent domain", 9.0, 5.6),
-        ("figure", "sequence_diagram.png", "Figure 3.5: Sequence diagram for application and matching", 9.0, 5.8),
-        ("figure", "state_chart.png", "Figure 3.6: State chart for a job application", 8.8, 5.2),
-        ("figure", "activity_diagram.png", "Figure 3.7: Activity diagram from evidence preparation to audit", 6.4, 8.0),
+        ("figure", "dfd_level0.png", "Figure 3.2: Level-0 data-flow diagram (context)", 11.5, 6.4),
+        ("figure", "dfd_level1.png", "Figure 3.3: Level-1 data-flow diagram", 11.5, 6.9),
+        ("figure", "class_diagram.png", "Figure 3.4: Class diagram of the persistent domain", 11.5, 7.1),
+        ("figure", "sequence_diagram.png", "Figure 3.5: Sequence diagram for application and matching", 11.5, 7.5),
+        ("figure", "state_chart.png", "Figure 3.6: State chart for a job application", 11.5, 6.5),
+        ("figure", "activity_diagram.png", "Figure 3.7: Activity diagram from evidence preparation to audit", 8.0, 10.0),
     ]
 
     # Expand chapter 4.

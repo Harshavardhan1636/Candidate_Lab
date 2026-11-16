@@ -297,7 +297,7 @@ Citation metadata is in [`CITATION.cff`](CITATION.cff). If you reference this pr
 ```bibtex
 @misc{candidate_lab_2026,
   title  = {Candidate Lab: Fair and Explainable Machine Learning for Automated Candidate Selection and Skill Matching},
-  author = {Alle, Deekshith and Kammari, Siri vennala and Mohammad, Rizwana and Dyavanapelli, Harsha vardhan},
+  author = {Deekshith Alle and Siri vennala Kammari and Rizwana Mohammad and Harsha vardhan Dyavanapelli},
   year   = {2026},
   url    = {https://github.com/deekshithalle/Candidate_Lab}
 }

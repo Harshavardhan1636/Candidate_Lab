@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "If you use this project, please cite the Stage-1 report."
+title: "Candidate Lab: Stage-1 Project"
+authors:
+  - family-names: Alle
+    given-names: Deekshith
+  - family-names: Kammari
+    given-names: Siri vennala
+  - family-names: Mohammad
+    given-names: Rizwana
+  - family-names: Dyavanapelli
+    given-names: Harsha vardhan
+date-released: 2026-11-16
+repository-code: "https://github.com/deekshithalle/Candidate_Lab"
